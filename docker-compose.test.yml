@@ -1,0 +1,53 @@
+version: '3.9'
+
+# Testing environment with integration tests
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      - DEBUG=true
+      - DB_URL=postgresql://test:test@postgres-test:5432/test
+      - OLLAMA_API_URL=http://ollama-test:11434
+    volumes:
+      - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - test
+    depends_on:
+      - postgres-test
+      - ollama-test
+    command: pytest tests/
+
+  postgres-test:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+    networks:
+      - test
+    entrypoint: ["postgres", "-c", "fsync=off"]
+
+  ollama-test:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-test-data:/root/.ollama
+    networks:
+      - test
+
+  prometheus-test:
+    image: prom/prometheus:latest
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - test
+
+volumes:
+  ollama-test-data:
+
+networks:
+  test:
+    driver: bridge
