@@ -48,3 +48,40 @@ async def receive_webhook_alert(payload: Dict[str, Any]) -> Dict[str, str]:
         "status": "received",
         "message": "Alert received and queued for analysis",
     }
+
+
+@router.get("/incidents")
+async def list_incidents() -> Dict[str, Any]:
+    """Get list of recent incidents"""
+    from datetime import timedelta
+    
+    incidents = [
+        {
+            "id": 1,
+            "title": "High CPU Usage - API Server",
+            "severity": "high",
+            "status": "resolved",
+            "component": "api-server",
+            "detected_at": datetime.utcnow().isoformat(),
+            "resolved_at": (datetime.utcnow() + timedelta(minutes=5)).isoformat(),
+        },
+        {
+            "id": 2,
+            "title": "Memory Leak - Worker Service",
+            "severity": "critical",
+            "status": "resolved",
+            "component": "worker-service",
+            "detected_at": (datetime.utcnow() - timedelta(hours=1)).isoformat(),
+            "resolved_at": (datetime.utcnow() - timedelta(minutes=30)).isoformat(),
+        },
+        {
+            "id": 3,
+            "title": "Connection Pool Exhaustion",
+            "severity": "medium",
+            "status": "inProgress",
+            "component": "database",
+            "detected_at": (datetime.utcnow() - timedelta(minutes=15)).isoformat(),
+            "resolved_at": None,
+        },
+    ]
+    return incidents
