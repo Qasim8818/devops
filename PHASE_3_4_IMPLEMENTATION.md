@@ -42,7 +42,7 @@ Fill in these fields:
 | Name | Your real name | Qasim Shafique |
 | Bio | What you do | Building self-healing DevSecOps systems. Open to consulting. |
 | Location | Your location | Remote |
-| Website | Your LinkedIn or website | https://www.linkedin.com/in/yourprofile |
+| Website | Your LinkedIn or website | https://www.linkedin.com/in/qasim |
 | Email | Professional email | qasimshafiq20@gmail.com |
 | Company | Optional | Your company or leave blank |
 

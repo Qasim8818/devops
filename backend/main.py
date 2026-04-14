@@ -15,7 +15,7 @@ from config import Settings, get_settings
 from core.monitoring import MonitoringEngine
 from core.ai import AIEngine
 from core.ai_alerting import AlertingEngine
-from routes import api, health, incidents, audit, remediation
+from routes import api, health, incidents, audit, remediation, advanced
 from database import init_db
 from logger import setup_logging
 
@@ -96,6 +96,7 @@ app.include_router(api.router, prefix="/api", tags=["api"])
 app.include_router(incidents.router, prefix="/api/incidents", tags=["incidents"])
 app.include_router(audit.router, prefix="/api/audit", tags=["audit"])
 app.include_router(remediation.router, prefix="/api/remediation", tags=["remediation"])
+app.include_router(advanced.router, prefix="/api/advanced", tags=["advanced"])
 
 
 @app.get("/")
