@@ -3,9 +3,11 @@ Audit Report Routes
 """
 
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from typing import Dict, Any
 from datetime import datetime
+from backend.advanced.pdf_generator import PDFReportGenerator
+import io
 
 router = APIRouter()
 
@@ -47,9 +49,17 @@ async def get_audit_status(report_id: str) -> Dict[str, Any]:
 @router.get("/{report_id}/pdf")
 async def download_audit_pdf(report_id: str):
     """Download audit report as PDF"""
-    
-    # Placeholder - implement PDF generation
-    return {
-        "message": "PDF generation not yet implemented",
-        "report_id": report_id,
-    }
+    # Example data; in production, fetch real findings and recommendations
+    findings = {"critical": 0, "high": 2, "medium": 5, "low": 8}
+    recommendations = [
+        "Patch high severity vulnerabilities immediately.",
+        "Review medium and low findings in next audit cycle."
+    ]
+    pdf_gen = PDFReportGenerator()
+    pdf_bytes = pdf_gen.generate_audit_report(
+        company_name="Acme Corp",
+        audit_date=datetime.utcnow(),
+        findings=findings,
+        recommendations=recommendations,
+    )
+    return StreamingResponse(io.BytesIO(pdf_bytes), media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename=report_{report_id}.pdf"})

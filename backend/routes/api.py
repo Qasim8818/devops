@@ -3,11 +3,13 @@ API Routes - Main API endpoints
 """
 
 from typing import Dict, Any, List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from datetime import datetime
 
 from config import get_settings
 from database import get_session, Incident
+from backend.advanced.cost_anomaly import CostAnomalyDetector
+from backend.advanced.cve_scanner import CVEScanner
 
 router = APIRouter()
 settings = get_settings()
@@ -85,3 +87,45 @@ async def list_incidents() -> List[Dict[str, Any]]:
         },
     ]
     return incidents
+
+
+@router.get("/cost/aws-anomaly")
+async def aws_cost_anomaly():
+    detector = CostAnomalyDetector()
+    return await detector.analyze_aws_costs()
+
+
+@router.get("/cost/gcp-anomaly")
+async def gcp_cost_anomaly():
+    detector = CostAnomalyDetector()
+    return await detector.analyze_gcp_costs()
+
+
+@router.get("/cost/forecast")
+async def cost_forecast(days: int = 30):
+    detector = CostAnomalyDetector()
+    return await detector.get_cost_forecast(days_ahead=days)
+
+
+@router.get("/cost/by-service")
+async def cost_by_service(provider: str = "aws"):
+    detector = CostAnomalyDetector()
+    return await detector.get_cost_by_service(provider)
+
+
+@router.post("/cve/scan-docker")
+async def scan_docker_image(payload: dict = Body(...)):
+    image_name = payload.get("image_name")
+    if not image_name:
+        raise HTTPException(status_code=400, detail="image_name is required")
+    scanner = CVEScanner()
+    return await scanner.scan_docker_image(image_name)
+
+
+@router.post("/cve/scan-requirements")
+async def scan_requirements(payload: dict = Body(...)):
+    requirements = payload.get("requirements")
+    if not requirements or not isinstance(requirements, list):
+        raise HTTPException(status_code=400, detail="requirements (list) is required")
+    scanner = CVEScanner()
+    return await scanner.scan_requirements(requirements)
