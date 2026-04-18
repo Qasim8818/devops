@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
     
     try:
         # Initialize database
-        init_db()
+        await init_db()
         logger.info("Database initialized")
         
         # Initialize engines

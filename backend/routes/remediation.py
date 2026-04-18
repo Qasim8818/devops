@@ -5,8 +5,16 @@ Remediation Routes
 from fastapi import APIRouter, HTTPException
 from typing import Dict, Any, List
 from datetime import datetime
+from pydantic import BaseModel
 
 router = APIRouter()
+
+
+class RemediationRequest(BaseModel):
+    """Request model for remediation execution"""
+    incident_id: str
+    action: str
+    dry_run: bool = True
 
 
 @router.get("/rules")
@@ -39,26 +47,22 @@ async def list_remediation_rules() -> List[Dict[str, Any]]:
 
 
 @router.post("/execute")
-async def execute_remediation(
-    incident_id: str,
-    action: str,
-    dry_run: bool = True,
-) -> Dict[str, Any]:
+async def execute_remediation(request: RemediationRequest) -> Dict[str, Any]:
     """Execute remediation action"""
     
-    if dry_run:
+    if request.dry_run:
         return {
             "status": "dry_run",
-            "incident_id": incident_id,
-            "action": action,
+            "incident_id": request.incident_id,
+            "action": request.action,
             "would_execute": True,
             "estimated_duration": "30-60 seconds",
         }
     
     return {
         "status": "executing",
-        "incident_id": incident_id,
-        "action": action,
+        "incident_id": request.incident_id,
+        "action": request.action,
         "start_time": datetime.utcnow().isoformat(),
         "estimated_completion": "30 seconds",
     }

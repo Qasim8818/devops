@@ -2,7 +2,7 @@
 API Routes - Main API endpoints
 """
 
-from typing import Dict, Any
+from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException
 from datetime import datetime
 
@@ -51,7 +51,7 @@ async def receive_webhook_alert(payload: Dict[str, Any]) -> Dict[str, str]:
 
 
 @router.get("/incidents")
-async def list_incidents() -> Dict[str, Any]:
+async def list_incidents() -> List[Dict[str, Any]]:
     """Get list of recent incidents"""
     from datetime import timedelta
     
