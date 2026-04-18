@@ -2,10 +2,14 @@
 Remediation Routes
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, List
 from datetime import datetime
 from pydantic import BaseModel
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from database import RemediationRule, Incident, async_session, get_session
 
 router = APIRouter()
 
@@ -18,37 +22,50 @@ class RemediationRequest(BaseModel):
 
 
 @router.get("/rules")
-async def list_remediation_rules() -> List[Dict[str, Any]]:
+async def list_remediation_rules(
+    enabled: bool = None,
+    session: AsyncSession = Depends(get_session),
+) -> List[Dict[str, Any]]:
     """List all active remediation rules"""
+    
+    query = select(RemediationRule).order_by(RemediationRule.priority.desc())
+    
+    if enabled is not None:
+        query = query.where(RemediationRule.enabled == enabled)
+    
+    result = await session.execute(query)
+    rules = result.scalars().all()
     
     return [
         {
-            "rule_id": 1,
-            "name": "High CPU Auto-Scale",
-            "pattern": "container_cpu > 85",
-            "action": "scale_up",
-            "enabled": True,
-        },
-        {
-            "rule_id": 2,
-            "name": "Memory Pressure Restart",
-            "pattern": "container_memory > 90%",
-            "action": "restart_container",
-            "enabled": True,
-        },
-        {
-            "rule_id": 3,
-            "name": "Error Rate Circuit Breaker",
-            "pattern": "http_errors > 50 per minute",
-            "action": "trigger_alert",
-            "enabled": True,
-        },
+            "rule_id": rule.id,
+            "name": rule.name,
+            "description": rule.description,
+            "pattern": rule.pattern,
+            "remediation_command": rule.remediation_command,
+            "enabled": rule.enabled,
+            "priority": rule.priority,
+            "created_at": rule.created_at.isoformat() if rule.created_at else None,
+            "updated_at": rule.updated_at.isoformat() if rule.updated_at else None,
+        }
+        for rule in rules
     ]
 
 
 @router.post("/execute")
-async def execute_remediation(request: RemediationRequest) -> Dict[str, Any]:
+async def execute_remediation(
+    request: RemediationRequest,
+    session: AsyncSession = Depends(get_session),
+) -> Dict[str, Any]:
     """Execute remediation action"""
+    
+    # Verify incident exists
+    query = select(Incident).where(Incident.incident_id == request.incident_id)
+    result = await session.execute(query)
+    incident = result.scalar_one_or_none()
+    
+    if not incident:
+        raise HTTPException(status_code=404, detail=f"Incident {request.incident_id} not found")
     
     if request.dry_run:
         return {
@@ -57,7 +74,15 @@ async def execute_remediation(request: RemediationRequest) -> Dict[str, Any]:
             "action": request.action,
             "would_execute": True,
             "estimated_duration": "30-60 seconds",
+            "timestamp": datetime.utcnow().isoformat(),
         }
+    
+    # Update incident remediation status
+    incident.remediation_status = "running"
+    incident.remediation_action = request.action
+    incident.updated_at = datetime.utcnow()
+    
+    await session.commit()
     
     return {
         "status": "executing",
@@ -69,16 +94,36 @@ async def execute_remediation(request: RemediationRequest) -> Dict[str, Any]:
 
 
 @router.get("/history")
-async def remediation_history(limit: int = 50) -> List[Dict[str, Any]]:
+async def remediation_history(
+    incident_id: str = None,
+    limit: int = 50,
+    session: AsyncSession = Depends(get_session),
+) -> List[Dict[str, Any]]:
     """Get remediation execution history"""
+    
+    query = select(Incident).where(
+        (Incident.remediation_status.isnot(None)) &
+        (Incident.remediation_action.isnot(None))
+    ).order_by(Incident.updated_at.desc())
+    
+    if incident_id:
+        query = query.where(Incident.incident_id == incident_id)
+    
+    query = query.limit(limit)
+    
+    result = await session.execute(query)
+    incidents = result.scalars().all()
     
     return [
         {
-            "id": 1,
-            "incident_id": "inc_001",
-            "action": "restart_service",
-            "status": "success",
-            "duration_seconds": 45,
-            "executed_at": datetime.utcnow().isoformat(),
-        },
+            "id": incident.id,
+            "incident_id": incident.incident_id,
+            "action": incident.remediation_action,
+            "status": incident.remediation_status,
+            "duration_seconds": int((incident.resolved_at - incident.detected_at).total_seconds())
+                                if incident.resolved_at and incident.detected_at else None,
+            "executed_at": incident.detected_at.isoformat() if incident.detected_at else None,
+            "completed_at": incident.resolved_at.isoformat() if incident.resolved_at else None,
+        }
+        for incident in incidents
     ]
