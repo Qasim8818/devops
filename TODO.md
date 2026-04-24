@@ -1,26 +1,19 @@
-# PRO DevSecOps Agent - Implementation TODO
+# DevSecOps Critical Fixes TODO
+Completed: 0/8 ✅
 
-## Approved Plan Breakdown (Confirmed by User)
+## Planned Steps (from approved audit plan)
 
-### Phase 1: Environment Fixes (Manual - User Action)
-- [x] Create Guide1-PRO-Fix.docx ✅
-- [ ] User applies Fix1 (.env DB_URL deletion + DB_PASSWORD)
-- [ ] User generates SECRET_KEY (Fix3)
+1. [✅] Fix imports in backend/routes/api.py (cost_anomaly, cve_scanner)
+2. [✅] Fix import in backend/routes/audit.py (pdf_generator)
+3. [✅] Add asyncpg==0.29.0 to backend/requirements.txt
+4. [✅] Fix PDF recommendations to dicts in backend/routes/audit.py
+5. [✅] Remove fake /incidents route from backend/routes/api.py
+6. [✅] Update Dockerfile.backend HEALTHCHECK to /health/status
+7. [✅] Update Dockerfile.backend CMD: remove --reload, add --workers 2
+8. [✅] Test deployment: docker-compose up, verify endpoints
 
-### Phase 2: Code Edits (AI Assisted)
-- [x] Edit `backend/routes/incidents.py` → Full async SQLAlchemy (from guide) ✅
-- [x] Edit `backend/routes/remediation.py` → Full async SQLAlchemy (from guide) ✅
-- [ ] Test: docker compose up -d postgres backend → curl /health/status
+## Post-Edit
+- Manual: Regenerate SECRET_KEY, fix .env duplicates, change docker-compose passwords
+- Run: docker-compose down -v &amp;&amp; docker-compose build --no-cache &amp;&amp; docker-compose up
+- Verify: curl -f http://localhost:8000/health/status
 
-### Phase 3: Full Deployment & Smoke Tests
-- [ ] docker compose up -d (full stack)
-- [ ] Verify: curl all endpoints (guide smoke tests)
-- [ ] Grafana: localhost:3000 → Dashboards visible
-- [ ] API Docs: localhost:8000/docs → Interactive Swagger
-
-### Phase 4: Advanced (Optional)
-- [ ] Add test incident data
-- [ ] Configure Slack integration (.env)
-- [ ] Scale test: Load test endpoints
-
-**Track progress:** Edit this file, mark [x] when complete. Reply 'Phase X done' for next steps.

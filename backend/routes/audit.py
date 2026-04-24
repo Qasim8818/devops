@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
 from typing import Dict, Any
 from datetime import datetime
-from backend.advanced.pdf_generator import PDFReportGenerator
+from advanced.pdf_generator import PDFReportGenerator
 import io
 
 router = APIRouter()
@@ -51,9 +51,9 @@ async def download_audit_pdf(report_id: str):
     """Download audit report as PDF"""
     # Example data; in production, fetch real findings and recommendations
     findings = {"critical": 0, "high": 2, "medium": 5, "low": 8}
-    recommendations = [
-        "Patch high severity vulnerabilities immediately.",
-        "Review medium and low findings in next audit cycle."
+recommendations = [
+        {"title": "Patch high severity CVEs", "description": "Apply patches immediately.", "effort": "High"},
+        {"title": "Review medium/low findings", "description": "Address in next audit cycle.", "effort": "Low"},
     ]
     pdf_gen = PDFReportGenerator()
     pdf_bytes = pdf_gen.generate_audit_report(

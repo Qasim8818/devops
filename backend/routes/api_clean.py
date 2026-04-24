@@ -1,12 +1,13 @@
 """
-API Routes - Main API endpoints (Fake incidents removed)
+API Routes - Main API endpoints
 """
 
 from typing import Dict, Any, List
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, Depends, HTTPException, Body
 from datetime import datetime
 
 from config import get_settings
+from database import get_session, Incident
 from advanced.cost_anomaly import CostAnomalyDetector
 from advanced.cve_scanner import CVEScanner
 
@@ -61,3 +62,15 @@ async def aws_cost_anomaly():
 async def gcp_cost_anomaly():
     detector = CostAnomalyDetector()
     return await detector.analyze_gcp_costs()
+
+
+@router.get("/cost/forecast")
+async def cost_forecast(days: int = 30):
+    detector = CostAnomalyDetector()
+    return await detector.get_cost_forecast(days_ahead=days)
+
+
+@router.get("/cost/by-service")
+async def cost_by_service(provider: str = "aws"):
+    detector = CostAnomalyDetector()
+    return await detector.get_cost_by_service(provider)
