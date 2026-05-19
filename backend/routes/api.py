@@ -6,9 +6,11 @@ from typing import Dict, Any, List
 from fastapi import APIRouter, HTTPException, Body
 from datetime import datetime
 
-from config import get_settings
-from advanced.cost_anomaly import CostAnomalyDetector
-from advanced.cve_scanner import CVEScanner
+from backend.config import get_settings
+from backend.advanced.cost_anomaly import CostAnomalyDetector
+
+from backend.advanced.cve_scanner import CVEScanner
+
 
 router = APIRouter()
 settings = get_settings()

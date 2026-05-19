@@ -6,7 +6,9 @@ import sys
 import logging
 from loguru import logger as loguru_logger
 
-from config import get_settings
+from backend.config import get_settings
+
+
 
 
 def setup_logging():

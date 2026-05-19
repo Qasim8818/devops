@@ -6,7 +6,8 @@ from typing import Dict, Any, List
 from datetime import datetime, timedelta
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import Incident, get_session
+from backend.database import Incident, get_session
+
 
 router = APIRouter()
 

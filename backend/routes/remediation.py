@@ -7,7 +7,8 @@ from datetime import datetime
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import RemediationRule, Incident, get_session
+from backend.database import RemediationRule, Incident, get_session
+
 
 router = APIRouter()
 

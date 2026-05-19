@@ -6,7 +6,8 @@ from typing import Dict, Any, List
 import httpx
 from datetime import datetime
 
-from logger import setup_logging
+from backend.logger import setup_logging
+
 
 logger = setup_logging()
 

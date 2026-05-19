@@ -7,8 +7,9 @@ import json
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from logger import setup_logging
-from config import get_settings
+from backend.logger import setup_logging
+from backend.config import get_settings
+
 
 logger = setup_logging()
 settings = get_settings()

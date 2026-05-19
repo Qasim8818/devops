@@ -6,8 +6,9 @@ from typing import Dict, Any, Optional
 import httpx
 import json
 
-from logger import setup_logging
-from config import get_settings
+from backend.logger import setup_logging
+from backend.config import get_settings
+
 
 logger = setup_logging()
 settings = get_settings()

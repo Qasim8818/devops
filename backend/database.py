@@ -8,7 +8,8 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean, Text, JSON
 from datetime import datetime
 
-from config import get_settings
+from backend.config import get_settings
+
 
 
 settings = get_settings()

@@ -7,8 +7,9 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Any
 import httpx
 
-from logger import setup_logging
-from config import get_settings
+from backend.logger import setup_logging
+from backend.config import get_settings
+
 
 logger = setup_logging()
 settings = get_settings()

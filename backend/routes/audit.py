@@ -6,7 +6,8 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
 from typing import Dict, Any
 from datetime import datetime
-from advanced.pdf_generator import PDFReportGenerator
+from backend.advanced.pdf_generator import PDFReportGenerator
+
 import io
 
 router = APIRouter()

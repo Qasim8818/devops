@@ -11,13 +11,14 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from config import Settings, get_settings
-from core.monitoring import MonitoringEngine
-from core.ai import AIEngine
-from core.ai_alerting import AlertingEngine
-from routes import api, health, incidents, audit, remediation
-from database import init_db
-from logger import setup_logging
+from backend.config import Settings, get_settings
+from backend.core.monitoring import MonitoringEngine
+from backend.core.ai import AIEngine
+from backend.core.ai_alerting import AlertingEngine
+from backend.routes import api, health, incidents, audit, remediation
+from backend.database import init_db
+from backend.logger import setup_logging
+
 
 # Setup logging
 logger = setup_logging()

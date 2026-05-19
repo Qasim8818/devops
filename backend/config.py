@@ -9,6 +9,9 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    # If a .env exists but is malformed/missing quotes for list fields,
+    # pydantic-settings may raise before app start. Keep defaults safe.
+
     """Application settings"""
     
     # API
@@ -78,8 +81,45 @@ class Settings(BaseSettings):
     CONFIDENCE_THRESHOLD: float = 0.8
     
     class Config:
-        env_file = ".env"
+        # Disable env file loading by default; client deployments can still
+        # provide env vars directly. This prevents crashes when a local .env
+        # is present but malformed.
+        env_file = None
         case_sensitive = True
+
+        @classmethod
+        def customise_sources(cls, init_settings, env_settings, file_secret_settings):
+            # Use only environment variables + init settings.
+            # Avoid DotEnvSettingsSource entirely.
+            return (init_settings, env_settings)
+
+
+
+        @staticmethod
+        def parse_env_var(field_name: str, raw_value: str):
+            """Harden env parsing for list fields like ALLOWED_HOSTS.
+
+            Allows:
+            - ALLOWED_HOSTS="*" (or comma-separated)
+            - ALLOWED_HOSTS="[\"a.com\",\"b.com\"]" (JSON)
+            """
+            if field_name == "ALLOWED_HOSTS":
+                value = (raw_value or "").strip()
+                if value in ("", "null", "None"):
+                    return ["*"]
+                # Try JSON first
+                try:
+                    import json
+                    parsed = json.loads(value)
+                    if isinstance(parsed, list):
+                        return parsed
+                except Exception:
+                    pass
+                # Fallback to comma-separated
+                return [v.strip() for v in value.split(",") if v.strip()]
+
+            return raw_value
+
 
 
 @lru_cache()

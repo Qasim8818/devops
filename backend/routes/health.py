@@ -7,7 +7,8 @@ from datetime import datetime
 from typing import Dict, Any
 
 from sqlalchemy import text
-from database import engine
+from backend.database import engine
+
 
 router = APIRouter()
 

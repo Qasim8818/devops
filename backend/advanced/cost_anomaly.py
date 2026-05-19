@@ -5,7 +5,8 @@ Advanced Features - Cost Anomaly Detection
 from typing import Dict, Any, List
 from datetime import datetime, timedelta
 
-from logger import setup_logging
+from backend.logger import setup_logging
+
 
 logger = setup_logging()
 
