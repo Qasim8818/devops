@@ -2,7 +2,6 @@
 Database configuration and models
 """
 
-from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean, Text, JSON
@@ -11,12 +10,19 @@ from datetime import datetime
 from backend.config import get_settings
 
 
-
 settings = get_settings()
 
-# Async database setup
+# Normalise scheme: support both postgresql:// and postgres://
+_raw_url = settings.DB_URL
+for _prefix in ("postgresql://", "postgres://"):
+    if _raw_url.startswith(_prefix):
+        _async_url = "postgresql+asyncpg://" + _raw_url[len(_prefix):]
+        break
+else:
+    _async_url = _raw_url  # already has driver prefix
+
 engine = create_async_engine(
-    settings.DB_URL.replace("postgresql://", "postgresql+asyncpg://"),
+    _async_url,
     echo=settings.DEBUG,
     pool_size=settings.DB_POOL_SIZE,
     max_overflow=settings.DB_MAX_OVERFLOW,

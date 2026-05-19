@@ -290,7 +290,7 @@ export default function Dashboard() {
                     <div>
                       <h3 className="font-semibold text-gray-900">{rule.name}</h3>
                       <p className="text-sm text-gray-600">Pattern: {rule.pattern}</p>
-                      <p className="text-sm text-gray-600">Action: <kbd className="px-2 py-1 bg-gray-100 rounded">{rule.action}</kbd></p>
+                      <p className="text-sm text-gray-600">Action: <kbd className="px-2 py-1 bg-gray-100 rounded">{rule.remediation_command}</kbd></p>
                     </div>
                     <div className="flex items-center gap-4">
                       <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${

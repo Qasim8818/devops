@@ -83,7 +83,7 @@ class AlertingEngine:
                         {"title": "Description", "value": details.get("description", "N/A"), "short": False},
                     ],
                     "footer": "DevSecOps Agent",
-                    "ts": int(asyncio.get_event_loop().time()),
+                    "ts": int(asyncio.get_running_loop().time()),
                 }
             ]
         }
@@ -123,7 +123,7 @@ class AlertingEngine:
             "title": title,
             "severity": severity,
             "details": details,
-            "timestamp": asyncio.get_event_loop().time(),
+            "timestamp": asyncio.get_running_loop().time(),
         }
         
         # Could send to external webhooks configured in settings

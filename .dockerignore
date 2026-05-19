@@ -1,0 +1,12 @@
+.env
+.env.bak
+.env.example
+**/__pycache__
+**/*.pyc
+**/*.pyo
+.git
+.gitignore
+*.md
+logs/
+frontend/node_modules/
+frontend/build/

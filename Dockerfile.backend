@@ -2,10 +2,21 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+# System deps required by weasyprint
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpango-1.0-0 libpangoft2-1.0-0 libcairo2 libgdk-pixbuf2.0-0 \
+    libffi-dev shared-mime-info \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Copy only source — never copy .env into the image
+COPY backend/ ./backend/
+COPY monitoring/ ./monitoring/
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+# Ensure log directory exists
+RUN mkdir -p logs
+
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
 

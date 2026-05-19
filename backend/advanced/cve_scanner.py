@@ -16,7 +16,7 @@ class CVEScanner:
     """CVE vulnerability scanner for Docker images and dependencies"""
     
     def __init__(self):
-        self.nvd_api = "https://services.nvd.nist.gov/rest/json/cves/1.0"
+        self.nvd_api = "https://services.nvd.nist.gov/rest/json/cves/2.0"
         self.timeout = 10
     
     async def scan_docker_image(self, image_name: str) -> Dict[str, Any]:
@@ -67,14 +67,13 @@ class CVEScanner:
         
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
-                # Simplified - in production, implement actual NVD API integration
                 response = await client.get(
-                    f"{self.nvd_api}?resultsPerPage=10",
+                    self.nvd_api,
+                    params={"resultsPerPage": 10},
                     timeout=float(self.timeout),
                 )
-                
                 if response.status_code == 200:
-                    return response.json().get("result", {}).get("CVE_Items", [])
+                    return response.json().get("vulnerabilities", [])
                 
         except Exception as e:
             logger.error(f"Failed to fetch CVEs: {e}")
