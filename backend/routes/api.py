@@ -16,7 +16,7 @@ settings = get_settings()
 
 @router.get("/status")
 async def api_status() -> Dict[str, Any]:
-    \"\"\"Get API status\"\"\"
+    """Get API status"""
     return {
         "status": "operational",
         "version": "1.0.0",
@@ -32,7 +32,7 @@ async def api_status() -> Dict[str, Any]:
 
 @router.get("/config")
 async def get_config() -> Dict[str, Any]:
-    \"\"\"Get non-sensitive configuration\"\"\"
+    """Get non-sensitive configuration"""
     return {
         "prometheus_url": settings.PROMETHEUS_URL,
         "monitor_interval": settings.MONITOR_INTERVAL,
@@ -44,7 +44,7 @@ async def get_config() -> Dict[str, Any]:
 
 @router.post("/webhook/alert")
 async def receive_webhook_alert(payload: Dict[str, Any]) -> Dict[str, str]:
-    \"\"\"Receive webhook alerts from external sources\"\"\"
+    """Receive webhook alerts from external sources"""
     return {
         "status": "received",
         "message": "Alert received and queued for analysis",
@@ -61,3 +61,16 @@ async def aws_cost_anomaly():
 async def gcp_cost_anomaly():
     detector = CostAnomalyDetector()
     return await detector.analyze_gcp_costs()
+
+
+@router.get("/cost/forecast")
+async def cost_forecast(days: int = 30):
+    detector = CostAnomalyDetector()
+    return await detector.get_cost_forecast(days_ahead=days)
+
+
+@router.get("/cost/by-service")
+async def cost_by_service(provider: str = "aws"):
+    detector = CostAnomalyDetector()
+    return await detector.get_cost_by_service(provider)
+

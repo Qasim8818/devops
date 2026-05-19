@@ -51,7 +51,7 @@ async def download_audit_pdf(report_id: str):
     """Download audit report as PDF"""
     # Example data; in production, fetch real findings and recommendations
     findings = {"critical": 0, "high": 2, "medium": 5, "low": 8}
-recommendations = [
+    recommendations = [
         {"title": "Patch high severity CVEs", "description": "Apply patches immediately.", "effort": "High"},
         {"title": "Review medium/low findings", "description": "Address in next audit cycle.", "effort": "Low"},
     ]
